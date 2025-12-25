@@ -1,0 +1,99 @@
+# Azure Bicep / ARM Template .gitignore
+
+# VS Code settings
+.vscode/
+*.code-workspace
+
+# Parameter files with secrets (keep templates)
+*.parameters.json
+!*.parameters.template.json
+!*parameters.example.json
+
+# Azure CLI error logs
+azure.err
+azure.log
+
+# Bicep build artifacts
+.bicep/
+*.json
+!*.template.json
+!*.example.json
+
+# Azurite (Azure Storage Emulator)
+__azurite__*
+__blobstorage__
+__queuestorage__
+__tablestorage__
+
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Local parameter files with secrets
+local.parameters.json
+dev.parameters.json
+prod.parameters.json
+*secret*.json
+*password*.json
+*credential*.json
+
+# Terraform files (if mixed IaC)
+*.tfstate
+*.tfstate.*
+.terraform/
+*.tfvars
+
+# Pulumi files (if mixed IaC)
+Pulumi.*.yaml
+
+# Azure Functions
+local.settings.json
+.azure/
