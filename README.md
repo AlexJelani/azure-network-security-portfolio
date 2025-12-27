@@ -12,6 +12,12 @@ This repository contains multiple Azure security labs implemented with Bicep tem
 - **Skills**: Inbound security rules, least privilege access
 - **Duration**: ~15 minutes
 
+### 📁 [Lab 02: Configure Network Access to VM](./labs/02-network-access/)
+- **Focus**: Linux VM network access and web server setup
+- **Resources**: VNet, NSG, Ubuntu VM with Nginx
+- **Skills**: SSH/HTTP rules, automated software installation
+- **Duration**: ~10 minutes
+
 ### 🚧 More Labs Coming Soon
 - Application Security Groups (ASGs)
 - Azure Firewall implementation
