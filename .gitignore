@@ -97,3 +97,9 @@ Pulumi.*.yaml
 # Azure Functions
 local.settings.json
 .azure/
+
+# Video scripts and personal notes
+VIDEO-SCRIPT.md
+*-SCRIPT.md
+notes.md
+NOTES.md
