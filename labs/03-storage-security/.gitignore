@@ -1,0 +1,55 @@
+# Bicep/ARM Template artifacts
+*.zip
+*.tar.gz
+
+# Azure CLI output
+*.log
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Build artifacts
+build/
+dist/
+out/
+
+# Sensitive data
+secrets.json
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Deployment state
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+
+# Local parameter overrides
+*.local.json
+*local.parameters.json
