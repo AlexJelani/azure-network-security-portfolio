@@ -103,3 +103,10 @@ VIDEO-SCRIPT.md
 *-SCRIPT.md
 notes.md
 NOTES.md
+
+# Security scanning reports
+scout-report/
+prowler-output/
+*.scout
+*-tenant-*.html
+scoutsuite-results/
