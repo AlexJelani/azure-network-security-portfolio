@@ -65,10 +65,10 @@ resource publicIpPublic 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
   name: 'ContosoPublic-pip'
   location: location
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
   properties: {
-    publicIPAllocationMethod: 'Dynamic'
+    publicIPAllocationMethod: 'Static'
   }
 }
 
@@ -76,10 +76,10 @@ resource publicIpPrivate 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
   name: 'ContosoPrivate-pip'
   location: location
   sku: {
-    name: 'Basic'
+    name: 'Standard'
   }
   properties: {
-    publicIPAllocationMethod: 'Dynamic'
+    publicIPAllocationMethod: 'Static'
   }
 }
 
