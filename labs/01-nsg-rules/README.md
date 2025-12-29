@@ -32,6 +32,25 @@ az deployment group create \
 2. RDP to VM public IP with credentials above
 3. Browse to `http://[VM-PUBLIC-IP]` to see IIS page
 
+## Security Assessment
+Run ScoutSuite to validate NSG configuration and security posture:
+```bash
+# Install ScoutSuite (if not already installed)
+pip install scoutsuite
+
+# Run security assessment
+scout azure --cli --report-dir ./scout-report
+
+# View results
+open ./scout-report/azure-tenant-*.html
+```
+
+**Expected Results:**
+- Network security rules analysis
+- VM security configuration review
+- NSG effectiveness validation
+- Overall security score and recommendations
+
 ## Cleanup
 ```bash
 az group delete --name rg-nsg-lab --yes --no-wait

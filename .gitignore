@@ -104,6 +104,11 @@ VIDEO-SCRIPT.md
 notes.md
 NOTES.md
 
+# Dev.to articles and blog content
+DEV-TO-ARTICLE.md
+*-ARTICLE.md
+blog-*.md
+
 # Security scanning reports
 scout-report/
 prowler-output/
