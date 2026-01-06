@@ -42,7 +42,7 @@ az group create --name rg-lab05-private-endpoint --location eastus
 az deployment group create \
   --resource-group rg-lab05-private-endpoint \
   --template-file main.bicep \
-  --parameters adminUsername=azureuser adminPassword='YourSecurePassword123!'
+  --parameters sqlAdministratorLogin=azureuser sqlAdministratorLoginPassword='YourSecurePassword123!' vmAdminUsername=azureuser vmAdminPassword='YourSecurePassword123!'
 ```
 
 ### 3. Test Private Endpoint

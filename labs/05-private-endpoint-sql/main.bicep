@@ -1,204 +1,129 @@
-@description('Admin username for the VM')
-param adminUsername string
+@description('The administrator username of the SQL logical server')
+param sqlAdministratorLogin string
 
-@description('Admin password for the VM')
+@description('The administrator password of the SQL logical server.')
 @secure()
-param adminPassword string
+param sqlAdministratorLoginPassword string
 
-@description('Location for all resources')
+@description('Username for the Virtual Machine.')
+param vmAdminUsername string
+
+@description('Password for the Virtual Machine. The password must be at least 12 characters long and have lower case, upper characters, digit and a special character (Regex match)')
+@secure()
+param vmAdminPassword string
+
+@description('The size of the VM')
+param VmSize string = 'Standard_B2s'
+
+@description('Location for all resources.')
 param location string = resourceGroup().location
 
-@description('Unique suffix for resource names')
-param uniqueSuffix string = uniqueString(resourceGroup().id)
+var vnetName = 'myVirtualNetwork'
+var vnetAddressPrefix = '10.0.0.0/16'
+var subnet1Prefix = '10.0.0.0/24'
+var subnet1Name = 'mySubnet'
+var sqlServerName = 'sqlserver${uniqueString(resourceGroup().id)}'
+var databaseName = '${sqlServerName}/sample-db'
+var privateEndpointName = 'myPrivateEndpoint'
+var privateDnsZoneName = 'privatelink${environment().suffixes.sqlServerHostname}'
+var pvtEndpointDnsGroupName = '${privateEndpointName}/mydnsgroupname'
+var vmName = take('myVm${uniqueString(resourceGroup().id)}', 15)
+var publicIpAddressName = '${vmName}PublicIP'
+var networkInterfaceName = '${vmName}NetInt'
+var osDiskType = 'StandardSSD_LRS'
 
-// Variables
-var vnetName = 'vnet-lab05-${uniqueSuffix}'
-var subnetName = 'subnet-vm'
-var privateSubnetName = 'subnet-private'
-var nsgName = 'nsg-lab05-${uniqueSuffix}'
-var vmName = 'vm-lab05-${uniqueSuffix}'
-var sqlServerName = 'sql-lab05-${uniqueSuffix}'
-var sqlDatabaseName = 'testdb'
-var privateEndpointName = 'pe-sql-${uniqueSuffix}'
-var privateDnsZoneName = 'privatelink.database.windows.net'
-var nicName = 'nic-lab05-${uniqueSuffix}'
-var publicIpName = 'pip-lab05-${uniqueSuffix}'
-
-// Network Security Group
-resource nsg 'Microsoft.Network/networkSecurityGroups@2023-05-01' = {
-  name: nsgName
+resource sqlServer 'Microsoft.Sql/servers@2021-11-01-preview' = {
+  name: sqlServerName
   location: location
+  tags: {
+    displayName: sqlServerName
+  }
   properties: {
-    securityRules: [
-      {
-        name: 'AllowRDP'
-        properties: {
-          priority: 1000
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Inbound'
-          sourceAddressPrefix: '*'
-          sourcePortRange: '*'
-          destinationAddressPrefix: '*'
-          destinationPortRange: '3389'
-        }
-      }
-      {
-        name: 'AllowSQL'
-        properties: {
-          priority: 1100
-          protocol: 'Tcp'
-          access: 'Allow'
-          direction: 'Outbound'
-          sourceAddressPrefix: 'VirtualNetwork'
-          sourcePortRange: '*'
-          destinationAddressPrefix: 'VirtualNetwork'
-          destinationPortRange: '1433'
-        }
-      }
-    ]
+    administratorLogin: sqlAdministratorLogin
+    administratorLoginPassword: sqlAdministratorLoginPassword
+    version: '12.0'
+    publicNetworkAccess: 'Disabled'
   }
 }
 
-// Virtual Network
-resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
+resource database 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
+  name: databaseName
+  location: location
+  sku: {
+    name: 'Basic'
+    tier: 'Basic'
+    capacity: 5
+  }
+  tags: {
+    displayName: databaseName
+  }
+  properties: {
+    collation: 'SQL_Latin1_General_CP1_CI_AS'
+    maxSizeBytes: 104857600
+    sampleName: 'AdventureWorksLT'
+  }
+  dependsOn: [
+    sqlServer
+  ]
+}
+
+resource vnet 'Microsoft.Network/virtualNetworks@2021-05-01' = {
   name: vnetName
   location: location
   properties: {
     addressSpace: {
-      addressPrefixes: ['10.0.0.0/16']
-    }
-    subnets: [
-      {
-        name: subnetName
-        properties: {
-          addressPrefix: '10.0.0.0/24'
-          networkSecurityGroup: {
-            id: nsg.id
-          }
-        }
-      }
-      {
-        name: privateSubnetName
-        properties: {
-          addressPrefix: '10.0.1.0/24'
-          privateEndpointNetworkPolicies: 'Disabled'
-        }
-      }
-    ]
-  }
-}
-
-// Public IP
-resource publicIp 'Microsoft.Network/publicIPAddresses@2023-05-01' = {
-  name: publicIpName
-  location: location
-  sku: {
-    name: 'Standard'
-  }
-  properties: {
-    publicIPAllocationMethod: 'Static'
-  }
-}
-
-// Network Interface
-resource nic 'Microsoft.Network/networkInterfaces@2023-05-01' = {
-  name: nicName
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          privateIPAllocationMethod: 'Dynamic'
-          subnet: {
-            id: vnet.properties.subnets[0].id
-          }
-          publicIPAddress: {
-            id: publicIp.id
-          }
-        }
-      }
-    ]
-  }
-}
-
-// Virtual Machine
-resource vm 'Microsoft.Compute/virtualMachines@2023-03-01' = {
-  name: vmName
-  location: location
-  properties: {
-    hardwareProfile: {
-      vmSize: 'Standard_B2s'
-    }
-    osProfile: {
-      computerName: vmName
-      adminUsername: adminUsername
-      adminPassword: adminPassword
-      windowsConfiguration: {
-        enableAutomaticUpdates: true
-        provisionVMAgent: true
-      }
-    }
-    storageProfile: {
-      imageReference: {
-        publisher: 'MicrosoftWindowsServer'
-        offer: 'WindowsServer'
-        sku: '2022-datacenter'
-        version: 'latest'
-      }
-      osDisk: {
-        createOption: 'FromImage'
-        managedDisk: {
-          storageAccountType: 'Standard_LRS'
-        }
-      }
-    }
-    networkProfile: {
-      networkInterfaces: [
-        {
-          id: nic.id
-        }
+      addressPrefixes: [
+        vnetAddressPrefix
       ]
     }
   }
 }
 
-// SQL Server
-resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
-  name: sqlServerName
-  location: location
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = {
+  parent: vnet
+  name: subnet1Name
   properties: {
-    administratorLogin: adminUsername
-    administratorLoginPassword: adminPassword
-    publicNetworkAccess: 'Disabled'
+    addressPrefix: subnet1Prefix
+    privateEndpointNetworkPolicies: 'Disabled'
   }
 }
 
-// SQL Database
-resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-05-01-preview' = {
-  parent: sqlServer
-  name: sqlDatabaseName
+resource privateEndpoint 'Microsoft.Network/privateEndpoints@2021-05-01' = {
+  name: privateEndpointName
   location: location
-  sku: {
-    name: 'Basic'
-    tier: 'Basic'
-  }
   properties: {
-    collation: 'SQL_Latin1_General_CP1_CI_AS'
+    subnet: {
+      id: subnet.id
+    }
+    privateLinkServiceConnections: [
+      {
+        name: privateEndpointName
+        properties: {
+          privateLinkServiceId: sqlServer.id
+          groupIds: [
+            'sqlServer'
+          ]
+        }
+      }
+    ]
   }
+  dependsOn: [
+    vnet
+  ]
 }
 
-// Private DNS Zone
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: privateDnsZoneName
   location: 'global'
+  properties: {}
+  dependsOn: [
+    vnet
+  ]
 }
 
-// Private DNS Zone VNet Link
-resource privateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
+resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
   parent: privateDnsZone
-  name: '${vnetName}-link'
+  name: '${privateDnsZoneName}-link'
   location: 'global'
   properties: {
     registrationEnabled: false
@@ -208,30 +133,8 @@ resource privateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetwor
   }
 }
 
-// Private Endpoint
-resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
-  name: privateEndpointName
-  location: location
-  properties: {
-    subnet: {
-      id: vnet.properties.subnets[1].id
-    }
-    privateLinkServiceConnections: [
-      {
-        name: 'sql-connection'
-        properties: {
-          privateLinkServiceId: sqlServer.id
-          groupIds: ['sqlServer']
-        }
-      }
-    ]
-  }
-}
-
-// Private DNS Zone Group
-resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-05-01' = {
-  parent: privateEndpoint
-  name: 'default'
+resource pvtEndpointDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2021-05-01' = {
+  name: pvtEndpointDnsGroupName
   properties: {
     privateDnsZoneConfigs: [
       {
@@ -242,10 +145,87 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
       }
     ]
   }
+  dependsOn: [
+    privateEndpoint
+  ]
 }
 
-// Outputs
-output vmPublicIp string = publicIp.properties.ipAddress
-output sqlServerName string = sqlServer.name
-output sqlDatabaseName string = sqlDatabase.name
-output privateEndpointIp string = privateEndpoint.properties.networkInterfaces[0].properties.ipConfigurations[0].properties.privateIPAddress
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = {
+  name: publicIpAddressName
+  location: location
+  tags: {
+    displayName: publicIpAddressName
+  }
+  properties: {
+    publicIPAllocationMethod: 'Dynamic'
+  }
+}
+
+resource networkInterface 'Microsoft.Network/networkInterfaces@2021-05-01' = {
+  name: networkInterfaceName
+  location: location
+  tags: {
+    displayName: networkInterfaceName
+  }
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipConfig1'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: {
+            id: publicIpAddress.id
+          }
+          subnet: {
+            id: subnet.id
+          }
+        }
+      }
+    ]
+  }
+  dependsOn: [
+    vnet
+  ]
+}
+
+resource vm 'Microsoft.Compute/virtualMachines@2021-11-01' = {
+  name: vmName
+  location: location
+  tags: {
+    displayName: vmName
+  }
+  properties: {
+    hardwareProfile: {
+      vmSize: VmSize
+    }
+    osProfile: {
+      computerName: vmName
+      adminUsername: vmAdminUsername
+      adminPassword: vmAdminPassword
+    }
+    storageProfile: {
+      imageReference: {
+        publisher: 'MicrosoftWindowsServer'
+        offer: 'WindowsServer'
+        sku: '2019-Datacenter'
+        version: 'latest'
+      }
+      osDisk: {
+        name: '${vmName}OsDisk'
+        caching: 'ReadWrite'
+        createOption: 'FromImage'
+        managedDisk: {
+          storageAccountType: osDiskType
+        }
+        diskSizeGB: 128
+      }
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: networkInterface.id
+        }
+      ]
+    }
+  }
+}

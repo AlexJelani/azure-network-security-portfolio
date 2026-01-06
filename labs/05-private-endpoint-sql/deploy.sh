@@ -44,11 +44,10 @@ az group create \
     --output table
 
 # Deploy Bicep template
-echo -e "${YELLOW}Deploying infrastructure with Bicep template...${NC}"
-DEPLOYMENT_OUTPUT=$(az deployment group create \
+az deployment group create \
     --resource-group $RESOURCE_GROUP \
     --template-file main.bicep \
-    --parameters adminUsername=$ADMIN_USERNAME adminPassword="$ADMIN_PASSWORD" \
+    --parameters sqlAdministratorLogin=$ADMIN_USERNAME sqlAdministratorLoginPassword="$ADMIN_PASSWORD" vmAdminUsername=$ADMIN_USERNAME vmAdminPassword="$ADMIN_PASSWORD" \
     --query 'properties.outputs' \
     --output json)
 
