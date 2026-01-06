@@ -18,6 +18,18 @@ This repository contains multiple Azure security labs implemented with Bicep tem
 - **Skills**: SSH/HTTP rules, automated software installation
 - **Duration**: ~10 minutes
 
+### 📁 [Lab 03: Storage Security with Service Endpoints](./labs/03-storage-security/)
+- **Focus**: Azure Storage security with VNet service endpoints
+- **Resources**: VNet, Storage Account, Windows VMs
+- **Skills**: Service endpoints, storage network ACLs, secure connectivity
+- **Duration**: ~20 minutes
+
+### 📁 [Lab 04: Traffic Manager with Subnet Routing](./labs/04-traffic-manager/)
+- **Focus**: DNS-based load balancing and subnet-based traffic routing
+- **Resources**: Multi-region VMs, Traffic Manager profile, IIS web servers
+- **Skills**: Traffic routing methods, endpoint health monitoring, multi-region deployment
+- **Duration**: ~90 minutes
+
 ### 🚧 More Labs Coming Soon
 - Application Security Groups (ASGs)
 - Azure Firewall implementation
@@ -69,10 +81,13 @@ This repository contains multiple Azure security labs implemented with Bicep tem
 ```
 azure-network-security-portfolio/
 ├── labs/
-│   ├── 01-nsg-rules/          # Network Security Group rules
-│   ├── 02-asg-implementation/  # Application Security Groups (planned)
-│   ├── 03-azure-firewall/      # Azure Firewall setup (planned)
-│   └── 04-keyvault-integration/ # Key Vault integration (planned)
+│   ├── 01-nsg-rules/           # Network Security Group rules
+│   ├── 02-network-access/      # VM network access configuration
+│   ├── 03-storage-security/    # Storage security with service endpoints
+│   ├── 04-traffic-manager/     # Traffic Manager subnet routing
+│   ├── 05-asg-implementation/  # Application Security Groups (planned)
+│   ├── 06-azure-firewall/      # Azure Firewall setup (planned)
+│   └── 07-keyvault-integration/ # Key Vault integration (planned)
 ├── .gitignore
 └── README.md
 ```
