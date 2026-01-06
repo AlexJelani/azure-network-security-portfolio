@@ -30,6 +30,12 @@ This repository contains multiple Azure security labs implemented with Bicep tem
 - **Skills**: Traffic routing methods, endpoint health monitoring, multi-region deployment
 - **Duration**: ~90 minutes
 
+### 📁 [Lab 05: Private Endpoint for SQL Database](./labs/05-private-endpoint-sql/)
+- **Focus**: Private endpoints and secure database connectivity
+- **Resources**: VNet, Azure SQL Database, Windows VM, Private DNS zone
+- **Skills**: Private Link, network isolation, secure database access
+- **Duration**: ~90 minutes
+
 ### 🚧 More Labs Coming Soon
 - Application Security Groups (ASGs)
 - Azure Firewall implementation
@@ -85,9 +91,10 @@ azure-network-security-portfolio/
 │   ├── 02-network-access/      # VM network access configuration
 │   ├── 03-storage-security/    # Storage security with service endpoints
 │   ├── 04-traffic-manager/     # Traffic Manager subnet routing
-│   ├── 05-asg-implementation/  # Application Security Groups (planned)
-│   ├── 06-azure-firewall/      # Azure Firewall setup (planned)
-│   └── 07-keyvault-integration/ # Key Vault integration (planned)
+│   ├── 05-private-endpoint-sql/ # Private endpoint for SQL Database
+│   ├── 06-asg-implementation/  # Application Security Groups (planned)
+│   ├── 07-azure-firewall/      # Azure Firewall setup (planned)
+│   └── 08-keyvault-integration/ # Key Vault integration (planned)
 ├── .gitignore
 └── README.md
 ```
